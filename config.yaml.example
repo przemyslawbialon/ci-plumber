@@ -1,0 +1,21 @@
+github:
+  token: "PLACEHOLDER_TOKEN_HERE"
+  repo: "Dapulse/dapulse"
+  
+labels:
+  trigger: "ci-plumber-to-merge"
+  auto_add:
+    - "Monoreason: Large effort"
+    - "workdays: Mon-Fri"
+    
+repository:
+  local_path: "/tmp/dapulse"
+  max_commits_behind: 100
+  
+linter:
+  fix_command: "npm run eslint:changed:master"
+  
+logging:
+  level: "INFO"
+  directory: "logs"
+

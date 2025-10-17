@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.ciplumber</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/Przemyslawb/Development/ci-plumber/venv/bin/python</string>
+        <string>/Users/Przemyslawb/Development/ci-plumber/ci_plumber.py</string>
+    </array>
+    
+    <key>WorkingDirectory</key>
+    <string>/Users/Przemyslawb/Development/ci-plumber</string>
+    
+    <key>StandardOutPath</key>
+    <string>/Users/Przemyslawb/Development/ci-plumber/logs/launchd-stdout.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/Users/Przemyslawb/Development/ci-plumber/logs/launchd-stderr.log</string>
+    
+    <key>StartInterval</key>
+    <integer>3600</integer>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin</string>
+    </dict>
+    
+    <key>RunAtLoad</key>
+    <false/>
+    
+    <key>KeepAlive</key>
+    <false/>
+</dict>
+</plist>
+
