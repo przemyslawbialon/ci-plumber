@@ -62,12 +62,12 @@ echo -e "${GREEN}✓ Dependencies installed in virtual environment${NC}"
 echo ""
 
 echo -e "${BOLD}[4/9]${NC} ${CYAN}⚙️  Checking configuration...${NC}"
-if [ ! -f "$SCRIPT_DIR/config.yaml" ]; then
-    echo -e "${YELLOW}⚠  config.yaml not found. Creating from example...${NC}"
-    cp "$SCRIPT_DIR/config.yaml.example" "$SCRIPT_DIR/config.yaml"
-    echo -e "${YELLOW}⚠  Please edit config.yaml and add your GitHub token!${NC}"
+if [ ! -f "$SCRIPT_DIR/cfg/config.yaml" ]; then
+    echo -e "${YELLOW}⚠  cfg/config.yaml not found. Creating from example...${NC}"
+    cp "$SCRIPT_DIR/cfg/config.yaml.example" "$SCRIPT_DIR/cfg/config.yaml"
+    echo -e "${YELLOW}⚠  Please edit cfg/config.yaml and add your GitHub token!${NC}"
 else
-    echo -e "${GREEN}✓ config.yaml exists${NC}"
+    echo -e "${GREEN}✓ cfg/config.yaml exists${NC}"
 fi
 echo ""
 
@@ -88,13 +88,13 @@ sleep 2
 echo ""
 
 echo -e "${BOLD}[8/9]${NC} ${CYAN}📄 Generating launchd plist file...${NC}"
-if [ ! -f "$SCRIPT_DIR/com.ciplumber.plist.template" ]; then
-    echo -e "${RED}✗ Error: com.ciplumber.plist.template not found!${NC}"
+if [ ! -f "$SCRIPT_DIR/launchd/com.ciplumber.plist.template" ]; then
+    echo -e "${RED}✗ Error: launchd/com.ciplumber.plist.template not found!${NC}"
     exit 1
 fi
 
-sed "s|{{PROJECT_PATH}}|$SCRIPT_DIR|g" "$SCRIPT_DIR/com.ciplumber.plist.template" > "$SCRIPT_DIR/com.ciplumber.plist"
-echo -e "${GREEN}✓ Generated com.ciplumber.plist${NC}"
+sed "s|{{PROJECT_PATH}}|$SCRIPT_DIR|g" "$SCRIPT_DIR/launchd/com.ciplumber.plist.template" > "$SCRIPT_DIR/launchd/com.ciplumber.plist"
+echo -e "${GREEN}✓ Generated launchd/com.ciplumber.plist${NC}"
 echo -e "${BLUE}  → Path: $SCRIPT_DIR${NC}"
 echo ""
 
@@ -104,7 +104,7 @@ if [ -f "$LAUNCH_AGENT_PATH" ]; then
     launchctl unload "$LAUNCH_AGENT_PATH" 2>/dev/null || true
 fi
 
-cp "$SCRIPT_DIR/com.ciplumber.plist" "$LAUNCH_AGENT_PATH"
+cp "$SCRIPT_DIR/launchd/com.ciplumber.plist" "$LAUNCH_AGENT_PATH"
 launchctl load "$LAUNCH_AGENT_PATH"
 echo -e "${GREEN}✓ Service installed and loaded${NC}"
 echo ""
@@ -129,5 +129,5 @@ echo ""
 echo -e "  ${CYAN}▶️  Start service:${NC}"
 echo -e "     launchctl load $LAUNCH_AGENT_PATH"
 echo ""
-echo -e "${YELLOW}${BOLD}⚠  Don't forget to add your GitHub token to config.yaml!${NC}"
+echo -e "${YELLOW}${BOLD}⚠  Don't forget to add your GitHub token to cfg/config.yaml!${NC}"
 

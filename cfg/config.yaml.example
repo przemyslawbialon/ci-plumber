@@ -18,4 +18,3 @@ linter:
 logging:
   level: "INFO"
   directory: "logs"
-

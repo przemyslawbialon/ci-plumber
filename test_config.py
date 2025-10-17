@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
 import yaml
 from github import Github, GithubException
 
@@ -23,19 +27,20 @@ def test_config():
     print(f"{Colors.NC}")
     
     try:
-        with open("config.yaml", "r") as f:
+        config_path = Path(__file__).parent / "cfg" / "config.yaml"
+        with open(config_path, "r") as f:
             config = yaml.safe_load(f)
-        print(f"{Colors.GREEN}✓ config.yaml loaded successfully{Colors.NC}")
+        print(f"{Colors.GREEN}✓ cfg/config.yaml loaded successfully{Colors.NC}")
     except FileNotFoundError:
-        print(f"{Colors.RED}✗ config.yaml not found!{Colors.NC}")
+        print(f"{Colors.RED}✗ cfg/config.yaml not found!{Colors.NC}")
         return False
     except yaml.YAMLError as e:
-        print(f"{Colors.RED}✗ config.yaml parsing error: {e}{Colors.NC}")
+        print(f"{Colors.RED}✗ cfg/config.yaml parsing error: {e}{Colors.NC}")
         return False
     
     token = config.get("github", {}).get("token")
     if not token or token == "PLACEHOLDER_TOKEN_HERE":
-        print(f"{Colors.RED}✗ GitHub token not configured in config.yaml{Colors.NC}")
+        print(f"{Colors.RED}✗ GitHub token not configured in cfg/config.yaml{Colors.NC}")
         return False
     print(f"{Colors.GREEN}✓ GitHub token found in config{Colors.NC}")
     
@@ -49,7 +54,7 @@ def test_config():
     
     repo_name = config.get("github", {}).get("repo")
     if not repo_name:
-        print(f"{Colors.RED}✗ Repository not configured in config.yaml{Colors.NC}")
+        print(f"{Colors.RED}✗ Repository not configured in cfg/config.yaml{Colors.NC}")
         return False
     
     try:

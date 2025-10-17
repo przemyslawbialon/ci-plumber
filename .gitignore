@@ -3,12 +3,11 @@ logs/
 *.pyc
 __pycache__/
 .DS_Store
-config.yaml
+cfg/config.yaml
 /tmp/dapulse/
 .venv/
 venv/
 *.swp
 *.swo
-*.pyc
-__pycache__/
-com.ciplumber.plist
+launchd/com.ciplumber.plist
+src/__pycache__/

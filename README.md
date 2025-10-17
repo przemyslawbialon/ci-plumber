@@ -10,6 +10,7 @@ Automated Pull Request management system for Dapulse/dapulse repository. This to
 - **Chromatic Retry**: Automatically retries failed Chromatic tests
 - **Auto-Merge**: Merges PRs when all checks pass and approvals are in place
 - **Comprehensive Logging**: Detailed logs for all operations
+- **Modular Architecture**: Clean separation of concerns with dedicated modules for GitHub, linter, and Chromatic handling
 
 ## Quick Start
 
@@ -43,7 +44,7 @@ The installation script will:
 
 **Note**: If `MONDAY_PATH` is not set, the script will prompt you for the path.
 
-**Important**: After installation, edit `config.yaml` and add your GitHub Personal Access Token.
+**Important**: After installation, edit `cfg/config.yaml` and add your GitHub Personal Access Token.
 
 ## Manual Setup
 
@@ -67,7 +68,7 @@ pip install -r requirements.txt
 
 ### 3. Configure GitHub Token
 
-Edit `config.yaml` and replace `PLACEHOLDER_TOKEN_HERE` with your GitHub Personal Access Token.
+Edit `cfg/config.yaml` and replace `PLACEHOLDER_TOKEN_HERE` with your GitHub Personal Access Token.
 
 The token needs the following permissions:
 - `repo` (full control of private repositories)
@@ -76,7 +77,11 @@ The token needs the following permissions:
 To create a token:
 1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
 2. Generate new token with required permissions
-3. Copy the token and paste it into `config.yaml`
+3. Copy the token and paste it into `cfg/config.yaml`
+
+For Fine-grained tokens, you need:
+- Repository access: `Dapulse/dapulse`
+- Permissions: Contents (R/W), Pull requests (R/W), Workflows (R/W), Actions (R/W)
 
 ### 4. Test Configuration
 
@@ -99,8 +104,8 @@ Check the logs in `logs/ci-plumber-YYYY-MM-DD.log` to verify everything works.
 ### 6. Generate and Install launchd Service (Hourly Automation)
 
 ```bash
-sed "s|{{PROJECT_PATH}}|$MONDAY_PATH/ci-plumber|g" com.ciplumber.plist.template > com.ciplumber.plist
-cp com.ciplumber.plist ~/Library/LaunchAgents/
+sed "s|{{PROJECT_PATH}}|$MONDAY_PATH/ci-plumber|g" launchd/com.ciplumber.plist.template > launchd/com.ciplumber.plist
+cp launchd/com.ciplumber.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.ciplumber.plist
 ```
 
@@ -131,9 +136,36 @@ launchctl load ~/Library/LaunchAgents/com.ciplumber.plist
 tail -f logs/ci-plumber-$(date +%Y-%m-%d).log
 ```
 
+## Project Structure
+
+```
+ci-plumber/
+├── src/                        # Source code modules
+│   ├── __init__.py
+│   ├── main.py                # Entry point
+│   ├── ci_plumber.py          # Main orchestrator
+│   ├── config_loader.py       # Configuration management
+│   ├── logger_setup.py        # Logging with colors
+│   ├── github_handler.py      # GitHub operations (labels, merge, status)
+│   ├── linter_fixer.py        # Linter auto-fix logic
+│   └── chromatic_handler.py   # Chromatic retry logic
+├── cfg/                        # Configuration files
+│   ├── config.yaml            # Main config (gitignored)
+│   └── config.yaml.example    # Example config
+├── launchd/                    # macOS launchd service files
+│   ├── com.ciplumber.plist.template  # Template for plist
+│   └── com.ciplumber.plist    # Generated plist (gitignored)
+├── logs/                       # Log files
+├── ci_plumber.py              # Wrapper script for backward compatibility
+├── test_config.py             # Configuration test script
+├── requirements.txt           # Python dependencies
+├── install.sh                 # Installation script
+└── README.md                  # Documentation
+```
+
 ## Configuration
 
-Edit `config.yaml` to customize:
+Edit `cfg/config.yaml` to customize:
 
 - **Repository settings**: Target repo, local clone path
 - **Label configuration**: Required labels to auto-add
@@ -157,8 +189,8 @@ Edit `config.yaml` to customize:
 If `MONDAY_PATH` is not set by your Monday.com profile, regenerate the plist file after setting it:
 ```bash
 cd $MONDAY_PATH/ci-plumber
-sed "s|{{PROJECT_PATH}}|$MONDAY_PATH/ci-plumber|g" com.ciplumber.plist.template > com.ciplumber.plist
-cp com.ciplumber.plist ~/Library/LaunchAgents/
+sed "s|{{PROJECT_PATH}}|$MONDAY_PATH/ci-plumber|g" launchd/com.ciplumber.plist.template > launchd/com.ciplumber.plist
+cp launchd/com.ciplumber.plist ~/Library/LaunchAgents/
 launchctl unload ~/Library/LaunchAgents/com.ciplumber.plist 2>/dev/null || true
 launchctl load ~/Library/LaunchAgents/com.ciplumber.plist
 ```
@@ -183,7 +215,7 @@ cat logs/launchd-stderr.log
 Ensure the GitHub token has correct permissions and hasn't expired.
 
 ### NPM/Node not found
-Update the `PATH` in `com.ciplumber.plist.template` to include your Node.js installation path, then regenerate the plist file.
+Update the `PATH` in `launchd/com.ciplumber.plist.template` to include your Node.js installation path, then regenerate the plist file.
 
 ### Virtual environment issues
 If you need to recreate the virtual environment:
