@@ -6,18 +6,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-import yaml
-from github import Github, GithubException
+import yaml  # noqa: E402
+from github import Github, GithubException  # noqa: E402
 
-
-class Colors:
-    RED = "\033[0;31m"
-    GREEN = "\033[0;32m"
-    YELLOW = "\033[1;33m"
-    BLUE = "\033[0;34m"
-    CYAN = "\033[0;36m"
-    BOLD = "\033[1m"
-    NC = "\033[0m"
+from src.console_utils import Colors  # noqa: E402
 
 
 def test_config():

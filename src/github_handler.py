@@ -2,6 +2,8 @@
 
 from github import GithubException
 
+from .ci_status import CIStatus
+
 
 class GitHubHandler:
     def __init__(self, repo, config, logger):
@@ -90,20 +92,18 @@ class GitHubHandler:
             combined_status = commit.get_combined_status()
             for status in combined_status.statuses:
                 if status.state == "failure":
-                    context = status.context.lower()
-                    if "lint" in context or "eslint" in context:
-                        statuses.append("linter_failed")
-                    elif "chromatic" in context:
-                        statuses.append("chromatic_failed")
+                    if CIStatus.is_linter_check(status.context):
+                        statuses.append(CIStatus.LINTER_FAILED)
+                    elif CIStatus.is_chromatic_check(status.context):
+                        statuses.append(CIStatus.CHROMATIC_FAILED)
 
             check_runs = commit.get_check_runs()
             for check in check_runs:
                 if check.conclusion == "failure":
-                    name = check.name.lower()
-                    if "lint" in name or "eslint" in name:
-                        statuses.append("linter_failed")
-                    elif "chromatic" in name:
-                        statuses.append("chromatic_failed")
+                    if CIStatus.is_linter_check(check.name):
+                        statuses.append(CIStatus.LINTER_FAILED)
+                    elif CIStatus.is_chromatic_check(check.name):
+                        statuses.append(CIStatus.CHROMATIC_FAILED)
 
         except Exception as e:
             self.logger.error(f"Error checking CI status for PR #{pr.number}: {e}")
@@ -148,107 +148,11 @@ class GitHubHandler:
                     )
                     return False
 
-            approval_check = self._check_approvals(pr)
-            if not approval_check["approved"]:
-                self._log_missing_approvals(pr, approval_check)
-                return False
-
             return True
 
         except Exception as e:
             self.logger.error(f"Error checking if PR #{pr.number} can merge: {e}")
             return False
-
-    def _check_approvals(self, pr):
-        reviews = pr.get_reviews()
-        approved_users = set()
-        has_changes_requested = False
-
-        for review in reviews:
-            if review.state == "APPROVED":
-                approved_users.add(review.user.login)
-            elif review.state == "CHANGES_REQUESTED":
-                has_changes_requested = True
-
-        if has_changes_requested:
-            return {"approved": False, "reason": "changes_requested"}
-
-        minimum_approvals = self.config.get("approvals", {}).get("minimum_count", 2)
-        approval_count = len(approved_users)
-
-        if approval_count < minimum_approvals:
-            return {
-                "approved": False,
-                "reason": "insufficient_approvals",
-                "count": approval_count,
-                "required": minimum_approvals,
-            }
-
-        try:
-            requested_reviewers = pr.get_review_requests()
-            requested_users = [user.login for user in requested_reviewers[0]]
-            requested_teams = [team.slug for team in requested_reviewers[1]]
-
-            missing_users = [user for user in requested_users if user not in approved_users]
-            missing_teams = []
-
-            for team in requested_teams:
-                try:
-                    team_obj = self.repo.organization.get_team_by_slug(team)
-                    team_members = [member.login for member in team_obj.get_members()]
-
-                    team_approved = any(member in approved_users for member in team_members)
-                    if not team_approved:
-                        missing_teams.append(team)
-                except Exception as e:
-                    self.logger.warning(f"⚠️  Could not check team '{team}': {e}")
-                    missing_teams.append(team)
-
-            if missing_users or missing_teams:
-                return {
-                    "approved": False,
-                    "reason": "missing_requested_reviews",
-                    "count": approval_count,
-                    "required": minimum_approvals,
-                    "missing_users": missing_users,
-                    "missing_teams": missing_teams,
-                }
-        except Exception as e:
-            self.logger.warning(f"⚠️  Could not check requested reviewers: {e}")
-
-        return {"approved": True, "count": approval_count}
-
-    def _log_missing_approvals(self, pr, approval_check):
-        reason = approval_check.get("reason")
-
-        if reason == "changes_requested":
-            self.logger.warning(f"🔄 PR #{pr.number} has requested changes")
-
-        elif reason == "insufficient_approvals":
-            count = approval_check.get("count", 0)
-            required = approval_check.get("required", 2)
-            needed = required - count
-            self.logger.warning(
-                f"❌ PR #{pr.number} needs {needed} more approval(s) (current: {count}/{required})"
-            )
-
-        elif reason == "missing_requested_reviews":
-            count = approval_check.get("count", 0)
-            required = approval_check.get("required", 2)
-            self.logger.warning(
-                f"⏳ PR #{pr.number} has {count}/{required} approvals but missing requested reviews:"
-            )
-
-            missing_users = approval_check.get("missing_users", [])
-            missing_teams = approval_check.get("missing_teams", [])
-
-            if missing_teams:
-                teams_str = ", ".join([f"@{team}" for team in missing_teams])
-                self.logger.warning(f"   🏢 Missing team approvals: {teams_str}")
-
-            if missing_users:
-                users_str = ", ".join([f"@{user}" for user in missing_users])
-                self.logger.warning(f"   👤 Missing user approvals: {users_str}")
 
     def merge_pr(self, pr):
         try:
