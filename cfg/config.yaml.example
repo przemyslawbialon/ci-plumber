@@ -7,7 +7,7 @@ labels:
   auto_add:
     - "workdays: Mon-Fri"
   categories:
-    - prefix: "Monoreason:"
+    - prefix: "Monoreason"
       default: "Monoreason: Large effort"
     
 repository:

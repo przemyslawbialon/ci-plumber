@@ -54,11 +54,11 @@ labels:
     - "automated"
   
   categories:
-    - prefix: "Monoreason:"
+    - prefix: "Monoreason"
       default: "Monoreason: Large effort"
-    - prefix: "Priority:"
+    - prefix: "Priority"
       default: "Priority: Medium"
-    - prefix: "Team:"
+    - prefix: "Team"
       default: "Team: Platform"
     
 repository:

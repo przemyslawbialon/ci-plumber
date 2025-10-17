@@ -38,7 +38,7 @@ Example configuration file with placeholders. Use this as a template to create y
 - `trigger`: Label that triggers CI Plumber processing
 - `auto_add`: Labels automatically added to PRs if missing
 - `categories`: Label categories with prefix-based logic
-  - `prefix`: Label prefix to check (e.g., "Monoreason:")
+  - `prefix`: Label prefix to check (e.g., "Monoreason")
   - `default`: Default label to add if no label with this prefix exists
 
 ### Repository
