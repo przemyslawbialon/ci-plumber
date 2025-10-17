@@ -49,10 +49,12 @@ Example configuration file with placeholders. Use this as a template to create y
 - `local_path`: Path where repository will be cloned for linter fixes
 - `max_commits_behind`: Maximum commits behind master before forcing branch update
 
+### Approvals
+- `minimum_count`: Minimum number of approvals required for merge (default: 2)
+
 ### Linter
 - `fix_command`: Command to run for linter auto-fix
 
 ### Logging
 - `level`: Log level (DEBUG, INFO, WARNING, ERROR)
 - `directory`: Directory for log files
-

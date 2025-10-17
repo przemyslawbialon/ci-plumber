@@ -55,6 +55,65 @@ authors:
 
 **Note**: The `authors` section is **required**. CI Plumber will fail to start if it's missing.
 
+## Approval Requirements
+
+CI Plumber enforces strict approval requirements before merging:
+
+### Configuration
+
+```yaml
+approvals:
+  minimum_count: 2
+```
+
+### How it works
+
+The system checks:
+
+1. **Minimum approvals** (default: 2)
+   - Must have at least 2 approvals from any reviewers
+
+2. **Requested reviewers (users)**
+   - If specific users are requested, they must approve
+
+3. **Requested teams**
+   - If a team is requested (e.g., @backend-team), at least one member must approve
+   - System checks team membership via GitHub API
+
+### Example Scenarios
+
+#### Scenario 1: Insufficient approvals
+```
+Current: 1 approval
+Required: 2 approvals
+Output: ❌ PR #123 needs 1 more approval(s) (current: 1/2)
+```
+
+#### Scenario 2: Missing team approval
+```
+Current: 2 approvals (alice, bob)
+Requested: @backend-team
+Team members: charlie, dave, eve
+Output: ⏳ PR #123 has 2/2 approvals but missing requested reviews:
+        🏢 Missing team approvals: @backend-team
+```
+
+#### Scenario 3: Missing specific user
+```
+Current: 2 approvals (alice, bob)
+Requested: charlie
+Output: ⏳ PR #123 has 2/2 approvals but missing requested reviews:
+        👤 Missing user approvals: @charlie
+```
+
+#### Scenario 4: Ready to merge
+```
+Current: 2 approvals (alice, bob)
+Requested: @backend-team
+Team member bob approved ✓
+Output: ✅ PR #123 is ready to merge
+```
+
 ## Label Management
 
 CI Plumber supports two types of label management:
@@ -103,14 +162,14 @@ authors:
   include_token_owner: true
   allowed_users:
     - "teammate1"
-  
+
 labels:
   trigger: "ci-plumber-to-merge"
-  
+
   auto_add:
     - "workdays: Mon-Fri"
     - "automated"
-  
+
   categories:
     - prefix: "Monoreason"
       default: "Monoreason: Large effort"
@@ -118,14 +177,17 @@ labels:
       default: "Priority: Medium"
     - prefix: "Team"
       default: "Team: Platform"
-    
+
 repository:
   local_path: "/tmp/dapulse"
   max_commits_behind: 100
-  
+
+approvals:
+  minimum_count: 2
+
 linter:
   fix_command: "npm run eslint:changed:master"
-  
+
 logging:
   level: "INFO"
   directory: "logs"
@@ -167,4 +229,3 @@ To add a new label category:
 3. Restart the service or run manually
 
 No code changes needed!
-

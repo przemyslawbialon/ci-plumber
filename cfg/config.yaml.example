@@ -5,7 +5,7 @@ github:
 authors:
   include_token_owner: true
   allowed_users: []
-  
+
 labels:
   trigger: "ci-plumber-to-merge"
   auto_add:
@@ -13,14 +13,17 @@ labels:
   categories:
     - prefix: "Monoreason"
       default: "Monoreason: Large effort"
-    
+
 repository:
   local_path: "/tmp/dapulse"
   max_commits_behind: 100
-  
+
+approvals:
+  minimum_count: 2
+
 linter:
   fix_command: "npm run eslint:changed:master"
-  
+
 logging:
   level: "INFO"
   directory: "logs"
