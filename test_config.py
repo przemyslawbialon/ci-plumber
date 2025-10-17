@@ -5,70 +5,86 @@ import yaml
 from github import Github, GithubException
 
 
+class Colors:
+    RED = '\033[0;31m'
+    GREEN = '\033[0;32m'
+    YELLOW = '\033[1;33m'
+    BLUE = '\033[0;34m'
+    CYAN = '\033[0;36m'
+    BOLD = '\033[1m'
+    NC = '\033[0m'
+
+
 def test_config():
-    print("Testing CI Plumber configuration...")
-    print("=" * 60)
+    print(f"{Colors.CYAN}{Colors.BOLD}")
+    print("╔════════════════════════════════════════════════════════════╗")
+    print("║          Testing CI Plumber Configuration 🧪             ║")
+    print("╚════════════════════════════════════════════════════════════╝")
+    print(f"{Colors.NC}")
     
     try:
         with open("config.yaml", "r") as f:
             config = yaml.safe_load(f)
-        print("✓ config.yaml loaded successfully")
+        print(f"{Colors.GREEN}✓ config.yaml loaded successfully{Colors.NC}")
     except FileNotFoundError:
-        print("✗ config.yaml not found!")
+        print(f"{Colors.RED}✗ config.yaml not found!{Colors.NC}")
         return False
     except yaml.YAMLError as e:
-        print(f"✗ config.yaml parsing error: {e}")
+        print(f"{Colors.RED}✗ config.yaml parsing error: {e}{Colors.NC}")
         return False
     
     token = config.get("github", {}).get("token")
     if not token or token == "PLACEHOLDER_TOKEN_HERE":
-        print("✗ GitHub token not configured in config.yaml")
+        print(f"{Colors.RED}✗ GitHub token not configured in config.yaml{Colors.NC}")
         return False
-    print("✓ GitHub token found in config")
+    print(f"{Colors.GREEN}✓ GitHub token found in config{Colors.NC}")
     
     try:
         g = Github(token)
         user = g.get_user()
-        print(f"✓ Successfully authenticated as: {user.login}")
+        print(f"{Colors.GREEN}✓ Successfully authenticated as: {Colors.BOLD}{user.login}{Colors.NC}")
     except GithubException as e:
-        print(f"✗ GitHub authentication failed: {e}")
+        print(f"{Colors.RED}✗ GitHub authentication failed: {e}{Colors.NC}")
         return False
     
     repo_name = config.get("github", {}).get("repo")
     if not repo_name:
-        print("✗ Repository not configured in config.yaml")
+        print(f"{Colors.RED}✗ Repository not configured in config.yaml{Colors.NC}")
         return False
     
     try:
         repo = g.get_repo(repo_name)
-        print(f"✓ Successfully accessed repository: {repo.full_name}")
+        print(f"{Colors.GREEN}✓ Successfully accessed repository: {Colors.BOLD}{repo.full_name}{Colors.NC}")
     except GithubException as e:
-        print(f"✗ Cannot access repository {repo_name}: {e}")
+        print(f"{Colors.RED}✗ Cannot access repository {repo_name}: {e}{Colors.NC}")
         return False
     
     trigger_label = config.get("labels", {}).get("trigger")
     if trigger_label:
-        print(f"✓ Trigger label configured: {trigger_label}")
+        print(f"{Colors.GREEN}✓ Trigger label configured: {Colors.CYAN}{trigger_label}{Colors.NC}")
     else:
-        print("✗ Trigger label not configured")
+        print(f"{Colors.RED}✗ Trigger label not configured{Colors.NC}")
         return False
     
     auto_labels = config.get("labels", {}).get("auto_add", [])
     if auto_labels:
-        print(f"✓ Auto-add labels configured: {', '.join(auto_labels)}")
+        print(f"{Colors.GREEN}✓ Auto-add labels configured: {Colors.CYAN}{', '.join(auto_labels)}{Colors.NC}")
     else:
-        print("⚠ No auto-add labels configured")
+        print(f"{Colors.YELLOW}⚠ No auto-add labels configured{Colors.NC}")
     
     linter_cmd = config.get("linter", {}).get("fix_command")
     if linter_cmd:
-        print(f"✓ Linter fix command configured: {linter_cmd}")
+        print(f"{Colors.GREEN}✓ Linter fix command configured: {Colors.CYAN}{linter_cmd}{Colors.NC}")
     else:
-        print("✗ Linter fix command not configured")
+        print(f"{Colors.RED}✗ Linter fix command not configured{Colors.NC}")
         return False
     
-    print("=" * 60)
-    print("✓ All configuration checks passed!")
-    print("\nYou can now run: python3 ci_plumber.py")
+    print(f"\n{Colors.GREEN}{Colors.BOLD}")
+    print("╔════════════════════════════════════════════════════════════╗")
+    print("║        ✓ All configuration checks passed! 🎉             ║")
+    print("╚════════════════════════════════════════════════════════════╝")
+    print(f"{Colors.NC}")
+    print(f"{Colors.CYAN}You can now run: {Colors.BOLD}python3 ci_plumber.py{Colors.NC}\n")
     return True
 
 
