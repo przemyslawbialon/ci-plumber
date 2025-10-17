@@ -11,3 +11,4 @@ venv/
 *.swo
 launchd/com.ciplumber.plist
 src/__pycache__/
+.vscode/
