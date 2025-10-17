@@ -5,8 +5,10 @@ github:
 labels:
   trigger: "ci-plumber-to-merge"
   auto_add:
-    - "Monoreason: Large effort"
     - "workdays: Mon-Fri"
+  categories:
+    - prefix: "Monoreason:"
+      default: "Monoreason: Large effort"
     
 repository:
   local_path: "/tmp/dapulse"

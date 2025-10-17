@@ -4,7 +4,7 @@ Automated Pull Request management system for Dapulse/dapulse repository. This to
 
 ## Features
 
-- **Automatic Label Management**: Adds missing labels (`Monoreason: Large effort`, `workdays: Mon-Fri`)
+- **Automatic Label Management**: Adds missing labels with smart category handling (e.g., only adds `Monoreason: Large effort` if no other Monoreason label exists)
 - **Branch Synchronization**: Updates branches that are too far behind master (>100 commits)
 - **Linter Auto-Fix**: Clones the repo, runs `npm run eslint:changed:master`, commits and pushes fixes
 - **Chromatic Retry**: Automatically retries failed Chromatic tests

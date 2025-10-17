@@ -22,20 +22,35 @@ class GitHubHandler:
     
     def ensure_required_labels(self, pr):
         current_labels = [label.name for label in pr.labels]
-        required_labels = self.config["labels"]["auto_add"]
         
-        for required_label in required_labels:
-            if required_label not in current_labels:
-                if required_label.startswith("Monoreason:"):
-                    has_monoreason = any(label.startswith("Monoreason:") for label in current_labels)
-                    if has_monoreason:
-                        self.logger.info(f"ℹ️  Skipping '{required_label}' - PR #{pr.number} already has a Monoreason label")
-                        continue
-                self.logger.info(f"🏷️  Adding missing label '{required_label}' to PR #{pr.number}")
+        auto_add_labels = self.config["labels"].get("auto_add", [])
+        for label in auto_add_labels:
+            if label not in current_labels:
+                self.logger.info(f"🏷️  Adding missing label '{label}' to PR #{pr.number}")
                 try:
-                    pr.add_to_labels(required_label)
+                    pr.add_to_labels(label)
                 except GithubException as e:
-                    self.logger.warning(f"⚠️  Failed to add label '{required_label}': {e}")
+                    self.logger.warning(f"⚠️  Failed to add label '{label}': {e}")
+        
+        label_categories = self.config["labels"].get("categories", [])
+        for category in label_categories:
+            prefix = category.get("prefix")
+            default_label = category.get("default")
+            
+            if not prefix or not default_label:
+                continue
+            
+            has_category_label = any(label.startswith(prefix) for label in current_labels)
+            
+            if not has_category_label:
+                self.logger.info(f"🏷️  Adding default label '{default_label}' for category '{prefix}' to PR #{pr.number}")
+                try:
+                    pr.add_to_labels(default_label)
+                except GithubException as e:
+                    self.logger.warning(f"⚠️  Failed to add label '{default_label}': {e}")
+            else:
+                existing_label = next((label for label in current_labels if label.startswith(prefix)), None)
+                self.logger.info(f"ℹ️  Skipping category '{prefix}' - PR #{pr.number} already has '{existing_label}'")
     
     def check_and_update_branch(self, pr):
         try:
@@ -94,20 +109,25 @@ class GitHubHandler:
                 return False
             
             if not pr.mergeable:
-                self.logger.info(f"❌ PR #{pr.number} is not mergeable (conflicts or other issues)")
+                self.logger.warning(f"❌ PR #{pr.number} is not mergeable (conflicts or other issues)")
                 return False
             
             commit = self.repo.get_commit(pr.head.sha)
             combined_status = commit.get_combined_status()
             
             if combined_status.state not in ["success"]:
-                self.logger.info(f"⏳ PR #{pr.number} combined status is '{combined_status.state}', not ready")
+                if combined_status.state == "failure":
+                    self.logger.warning(f"❌ PR #{pr.number} combined status is 'failure' - CI checks failed")
+                elif combined_status.state == "pending":
+                    self.logger.info(f"⏳ PR #{pr.number} combined status is 'pending' - waiting for CI")
+                else:
+                    self.logger.info(f"⏳ PR #{pr.number} combined status is '{combined_status.state}'")
                 return False
             
             check_runs = commit.get_check_runs()
             for check in check_runs:
                 if check.conclusion not in ["success", "skipped", "neutral", None]:
-                    self.logger.info(f"❌ PR #{pr.number} has failing check: {check.name} ({check.conclusion})")
+                    self.logger.warning(f"❌ PR #{pr.number} has failing check: {check.name} ({check.conclusion})")
                     return False
             
             reviews = pr.get_reviews()
@@ -116,7 +136,7 @@ class GitHubHandler:
                 if review.state == "APPROVED":
                     approved = True
                 elif review.state == "CHANGES_REQUESTED":
-                    self.logger.info(f"🔄 PR #{pr.number} has requested changes")
+                    self.logger.warning(f"🔄 PR #{pr.number} has requested changes")
                     return False
             
             if not approved:

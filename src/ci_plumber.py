@@ -67,7 +67,7 @@ class CIPlumber:
                 self.logger.info(f"✅ PR #{pr.number} is ready to merge")
                 self.github_handler.merge_pr(pr)
             else:
-                self.logger.info(f"⏳ PR #{pr.number} is not ready to merge yet")
+                self.logger.warning(f"⏸️  PR #{pr.number} is not ready to merge yet - see reasons above")
                 
         except Exception as e:
             self.logger.error(f"Error processing PR #{pr.number}: {e}", exc_info=True)
