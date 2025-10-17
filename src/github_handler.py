@@ -26,6 +26,11 @@ class GitHubHandler:
         
         for required_label in required_labels:
             if required_label not in current_labels:
+                if required_label.startswith("Monoreason:"):
+                    has_monoreason = any(label.startswith("Monoreason:") for label in current_labels)
+                    if has_monoreason:
+                        self.logger.info(f"ℹ️  Skipping '{required_label}' - PR #{pr.number} already has a Monoreason label")
+                        continue
                 self.logger.info(f"🏷️  Adding missing label '{required_label}' to PR #{pr.number}")
                 try:
                     pr.add_to_labels(required_label)
