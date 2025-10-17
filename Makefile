@@ -1,13 +1,18 @@
 .PHONY: format check install-hooks test clean
 
 format:
-	black src/ test_config.py ci_plumber.py
-	isort src/ test_config.py ci_plumber.py
+	@echo "🎨 Formatting code with Black..."
+	@black src/ test_config.py ci_plumber.py
+	@echo "📦 Sorting imports with isort..."
+	@isort src/ test_config.py ci_plumber.py
+	@echo "✅ Formatting complete!"
 
 check:
-	black --check src/ test_config.py ci_plumber.py
-	isort --check src/ test_config.py ci_plumber.py
-	flake8 src/ test_config.py ci_plumber.py
+	@echo "🔍 Checking code formatting..."
+	@black --check src/ test_config.py ci_plumber.py
+	@isort --check src/ test_config.py ci_plumber.py
+	@flake8 src/ test_config.py ci_plumber.py
+	@echo "✅ All checks passed!"
 
 install-hooks:
 	pre-commit install
@@ -29,4 +34,3 @@ help:
 	@echo "  make install-hooks - Install pre-commit hooks"
 	@echo "  make test          - Run configuration tests"
 	@echo "  make clean         - Remove Python cache files"
-
