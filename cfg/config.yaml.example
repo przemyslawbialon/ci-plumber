@@ -7,7 +7,7 @@ authors:
   allowed_users: []
 
 labels:
-  trigger: "ci-plumber-to-merge"
+  trigger: "ci-plumber"
   auto_add:
     - "workdays: Mon-Fri"
   categories:

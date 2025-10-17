@@ -164,7 +164,7 @@ authors:
     - "teammate1"
 
 labels:
-  trigger: "ci-plumber-to-merge"
+  trigger: "ci-plumber"
 
   auto_add:
     - "workdays: Mon-Fri"
@@ -197,21 +197,21 @@ logging:
 
 ### Example 1: Developer sets their own Monoreason
 ```
-PR labels: ["ci-plumber-to-merge", "Monoreason: Small effort"]
+PR labels: ["ci-plumber", "Monoreason: Small effort"]
 Result: Adds "workdays: Mon-Fri" only
 Action: Skips Monoreason (already has one)
 ```
 
 ### Example 2: No Monoreason set
 ```
-PR labels: ["ci-plumber-to-merge"]
+PR labels: ["ci-plumber"]
 Result: Adds "workdays: Mon-Fri" AND "Monoreason: Large effort"
 Action: Adds default Monoreason
 ```
 
 ### Example 3: Multiple categories
 ```
-PR labels: ["ci-plumber-to-merge", "Team: Backend"]
+PR labels: ["ci-plumber", "Team: Backend"]
 Result: Adds "workdays: Mon-Fri", "Monoreason: Large effort"
 Action: Adds default Monoreason, skips Team (already has one)
 ```

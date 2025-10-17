@@ -1,6 +1,6 @@
 # CI Plumber
 
-Automated Pull Request management system for Dapulse/dapulse repository. This tool automatically processes PRs labeled with `ci-plumber-to-merge`, fixes common issues, and merges them when ready.
+Automated Pull Request management system for Dapulse/dapulse repository. This tool automatically processes PRs labeled with `ci-plumber`, fixes common issues, and merges them when ready.
 
 ## Features
 
@@ -182,11 +182,11 @@ Edit `cfg/config.yaml` to customize:
 
 ## How It Works
 
-1. **Discovery**: Finds all open PRs with label `ci-plumber-to-merge`
+1. **Discovery**: Finds all open PRs with label `ci-plumber`
 2. **Label Check**: Ensures required labels are present
 3. **Branch Update**: Updates branch if too far behind master
 4. **CI Analysis**: Checks for linter and Chromatic failures
-5. **Auto-Fix**: 
+5. **Auto-Fix**:
    - Linter failures: Clones repo, runs fix command, commits & pushes
    - Chromatic failures: Retries the workflow
 6. **Merge**: When all checks pass and PR is approved, automatically merges
@@ -242,4 +242,3 @@ All operations are logged to `logs/ci-plumber-YYYY-MM-DD.log` with:
 - Actions taken (label additions, branch updates, fixes applied)
 - Success/failure status
 - Error details when issues occur
-
