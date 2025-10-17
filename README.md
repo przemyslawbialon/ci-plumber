@@ -15,32 +15,57 @@ Automated Pull Request management system for Dapulse/dapulse repository. This to
 
 ### Automatic Installation
 
+The `MONDAY_PATH` environment variable should already be set by your Monday.com profile. Verify it's set:
+
 ```bash
-cd /Users/Przemyslawb/Development/ci-plumber
+echo $MONDAY_PATH
+```
+
+If not set for any reason, export it temporarily:
+```bash
+export MONDAY_PATH="/Users/Przemyslawb/Development"
+```
+
+Run the installation script:
+
+```bash
+cd $MONDAY_PATH/ci-plumber
 ./install.sh
 ```
 
 The installation script will:
+- Use `$MONDAY_PATH` to configure all paths dynamically
+- Create a virtual environment
 - Install Python dependencies
-- Create necessary directories
+- Generate launchd plist with correct paths
 - Set up the launchd service for hourly execution
 - Test the configuration
+
+**Note**: If `MONDAY_PATH` is not set, the script will prompt you for the path.
 
 **Important**: After installation, edit `config.yaml` and add your GitHub Personal Access Token.
 
 ## Manual Setup
 
-### 1. Create Virtual Environment and Install Dependencies
+### 1. Verify Environment Variable
+
+Ensure `MONDAY_PATH` is set (should be done by Monday.com profile):
 
 ```bash
-cd /Users/Przemyslawb/Development/ci-plumber
+echo $MONDAY_PATH
+```
+
+### 2. Create Virtual Environment and Install Dependencies
+
+```bash
+cd $MONDAY_PATH/ci-plumber
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 2. Configure GitHub Token
+### 3. Configure GitHub Token
 
 Edit `config.yaml` and replace `PLACEHOLDER_TOKEN_HERE` with your GitHub Personal Access Token.
 
@@ -53,7 +78,7 @@ To create a token:
 2. Generate new token with required permissions
 3. Copy the token and paste it into `config.yaml`
 
-### 3. Test Configuration
+### 4. Test Configuration
 
 ```bash
 source venv/bin/activate
@@ -62,7 +87,7 @@ python test_config.py
 
 This will verify your GitHub token and repository access.
 
-### 4. Test Manual Run
+### 5. Test Manual Run
 
 ```bash
 source venv/bin/activate
@@ -71,9 +96,10 @@ python ci_plumber.py
 
 Check the logs in `logs/ci-plumber-YYYY-MM-DD.log` to verify everything works.
 
-### 5. Install launchd Service (Hourly Automation)
+### 6. Generate and Install launchd Service (Hourly Automation)
 
 ```bash
+sed "s|{{PROJECT_PATH}}|$MONDAY_PATH/ci-plumber|g" com.ciplumber.plist.template > com.ciplumber.plist
 cp com.ciplumber.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.ciplumber.plist
 ```
@@ -83,7 +109,7 @@ To verify it's loaded:
 launchctl list | grep ciplumber
 ```
 
-### 6. Manage the Service
+### 7. Manage the Service
 
 **Stop the service:**
 ```bash
@@ -127,6 +153,16 @@ Edit `config.yaml` to customize:
 
 ## Troubleshooting
 
+### MONDAY_PATH not set
+If `MONDAY_PATH` is not set by your Monday.com profile, regenerate the plist file after setting it:
+```bash
+cd $MONDAY_PATH/ci-plumber
+sed "s|{{PROJECT_PATH}}|$MONDAY_PATH/ci-plumber|g" com.ciplumber.plist.template > com.ciplumber.plist
+cp com.ciplumber.plist ~/Library/LaunchAgents/
+launchctl unload ~/Library/LaunchAgents/com.ciplumber.plist 2>/dev/null || true
+launchctl load ~/Library/LaunchAgents/com.ciplumber.plist
+```
+
 ### Service not running
 ```bash
 launchctl list | grep ciplumber
@@ -147,7 +183,7 @@ cat logs/launchd-stderr.log
 Ensure the GitHub token has correct permissions and hasn't expired.
 
 ### NPM/Node not found
-Update the `PATH` in `com.ciplumber.plist` to include your Node.js installation path.
+Update the `PATH` in `com.ciplumber.plist.template` to include your Node.js installation path, then regenerate the plist file.
 
 ### Virtual environment issues
 If you need to recreate the virtual environment:

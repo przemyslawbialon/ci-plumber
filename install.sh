@@ -6,8 +6,26 @@ echo "CI Plumber Installation Script"
 echo "==============================="
 echo ""
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+if [ -z "$MONDAY_PATH" ]; then
+    echo "Warning: MONDAY_PATH environment variable is not set."
+    echo "Please set it to your development directory (e.g., /Users/YourName/Development)"
+    echo ""
+    read -p "Enter your development path (or press Enter to use current directory): " INPUT_PATH
+    
+    if [ -z "$INPUT_PATH" ]; then
+        MONDAY_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+        echo "Using: $MONDAY_PATH"
+    else
+        MONDAY_PATH="$INPUT_PATH"
+    fi
+    echo ""
+fi
+
+SCRIPT_DIR="$MONDAY_PATH/ci-plumber"
 LAUNCH_AGENT_PATH="$HOME/Library/LaunchAgents/com.ciplumber.plist"
+
+echo "Project path: $SCRIPT_DIR"
+echo ""
 
 echo "Step 1: Checking Python3 installation..."
 if ! command -v python3 &> /dev/null; then
@@ -57,7 +75,17 @@ sleep 2
 "$SCRIPT_DIR/venv/bin/python" "$SCRIPT_DIR/ci_plumber.py" || echo "⚠️  Test run failed. Please check your configuration."
 echo ""
 
-echo "Step 8: Installing launchd service..."
+echo "Step 8: Generating launchd plist file..."
+if [ ! -f "$SCRIPT_DIR/com.ciplumber.plist.template" ]; then
+    echo "Error: com.ciplumber.plist.template not found!"
+    exit 1
+fi
+
+sed "s|{{PROJECT_PATH}}|$SCRIPT_DIR|g" "$SCRIPT_DIR/com.ciplumber.plist.template" > "$SCRIPT_DIR/com.ciplumber.plist"
+echo "✓ Generated com.ciplumber.plist with path: $SCRIPT_DIR"
+echo ""
+
+echo "Step 9: Installing launchd service..."
 if [ -f "$LAUNCH_AGENT_PATH" ]; then
     echo "Unloading existing service..."
     launchctl unload "$LAUNCH_AGENT_PATH" 2>/dev/null || true

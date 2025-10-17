@@ -11,3 +11,4 @@ venv/
 *.swo
 *.pyc
 __pycache__/
+com.ciplumber.plist
