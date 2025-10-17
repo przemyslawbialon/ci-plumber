@@ -58,6 +58,7 @@ echo -e "${BOLD}[3/9]${NC} ${CYAN}📥 Installing Python dependencies in virtual
 source "$SCRIPT_DIR/venv/bin/activate"
 pip install --upgrade pip -q
 pip install -r "$SCRIPT_DIR/requirements.txt" -q
+pip install -r "$SCRIPT_DIR/requirements-dev.txt" -q
 echo -e "${GREEN}✓ Dependencies installed in virtual environment${NC}"
 echo ""
 
@@ -81,13 +82,18 @@ chmod +x "$SCRIPT_DIR/ci_plumber.py"
 echo -e "${GREEN}✓ Script is now executable${NC}"
 echo ""
 
-echo -e "${BOLD}[7/9]${NC} ${CYAN}🧪 Testing manual run...${NC}"
+echo -e "${BOLD}[7/9]${NC} ${CYAN}🔧 Installing pre-commit hooks...${NC}"
+pre-commit install || echo -e "${YELLOW}⚠  Failed to install pre-commit hooks${NC}"
+echo -e "${GREEN}✓ Pre-commit hooks installed${NC}"
+echo ""
+
+echo -e "${BOLD}[8/9]${NC} ${CYAN}🧪 Testing manual run...${NC}"
 echo -e "${YELLOW}→ This will do a test run. Press Ctrl+C if you want to skip...${NC}"
 sleep 2
 "$SCRIPT_DIR/venv/bin/python" "$SCRIPT_DIR/ci_plumber.py" || echo -e "${YELLOW}⚠  Test run failed. Please check your configuration.${NC}"
 echo ""
 
-echo -e "${BOLD}[8/9]${NC} ${CYAN}📄 Generating launchd plist file...${NC}"
+echo -e "${BOLD}[9/10]${NC} ${CYAN}📄 Generating launchd plist file...${NC}"
 if [ ! -f "$SCRIPT_DIR/launchd/com.ciplumber.plist.template" ]; then
     echo -e "${RED}✗ Error: launchd/com.ciplumber.plist.template not found!${NC}"
     exit 1
@@ -98,7 +104,7 @@ echo -e "${GREEN}✓ Generated launchd/com.ciplumber.plist${NC}"
 echo -e "${BLUE}  → Path: $SCRIPT_DIR${NC}"
 echo ""
 
-echo -e "${BOLD}[9/9]${NC} ${CYAN}🚀 Installing launchd service...${NC}"
+echo -e "${BOLD}[10/10]${NC} ${CYAN}🚀 Installing launchd service...${NC}"
 if [ -f "$LAUNCH_AGENT_PATH" ]; then
     echo -e "${YELLOW}→ Unloading existing service...${NC}"
     launchctl unload "$LAUNCH_AGENT_PATH" 2>/dev/null || true

@@ -47,6 +47,8 @@ The installation script will:
 
 **Important**: After installation, edit `cfg/config.yaml` and add your GitHub Personal Access Token.
 
+**Note**: The installer automatically sets up pre-commit hooks for code formatting.
+
 ## Manual Setup
 
 ### 1. Verify Environment Variable
@@ -160,7 +162,12 @@ ci-plumber/
 ├── ci_plumber.py              # Wrapper script for backward compatibility
 ├── test_config.py             # Configuration test script
 ├── requirements.txt           # Python dependencies
+├── requirements-dev.txt       # Development dependencies
+├── pyproject.toml             # Black & isort configuration
+├── .pre-commit-config.yaml    # Pre-commit hooks configuration
+├── Makefile                   # Development commands
 ├── install.sh                 # Installation script
+├── CONTRIBUTING.md            # Development guide
 └── README.md                  # Documentation
 ```
 

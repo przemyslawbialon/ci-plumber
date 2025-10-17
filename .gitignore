@@ -12,3 +12,7 @@ venv/
 launchd/com.ciplumber.plist
 src/__pycache__/
 .vscode/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
