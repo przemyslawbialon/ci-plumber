@@ -44,8 +44,8 @@ class GitHubHandler:
 
             if not has_category_label:
                 self.logger.info(
-                    f"🏷️  Adding default label '{default_label}'"
-                    f" for category '{prefix}' to PR #{pr.number}"
+                    f"🏷️  Adding default label '{default_label}' "
+                    f"for category '{prefix}' to PR #{pr.number}"
                 )
                 try:
                     pr.add_to_labels(default_label)
@@ -56,8 +56,8 @@ class GitHubHandler:
                     (label for label in current_labels if label.startswith(prefix)), None
                 )
                 self.logger.info(
-                    f"ℹ️  Skipping category '{prefix}' - PR #{pr.number}"
-                    f" already has '{existing_label}'"
+                    f"ℹ️  Skipping category '{prefix}' - "
+                    f"PR #{pr.number} already has '{existing_label}'"
                 )
 
     def check_and_update_branch(self, pr):
