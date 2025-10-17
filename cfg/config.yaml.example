@@ -1,6 +1,10 @@
 github:
   token: "PLACEHOLDER_TOKEN_HERE"
   repo: "Dapulse/dapulse"
+
+authors:
+  include_token_owner: true
+  allowed_users: []
   
 labels:
   trigger: "ci-plumber-to-merge"

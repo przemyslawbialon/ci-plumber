@@ -34,6 +34,10 @@ Example configuration file with placeholders. Use this as a template to create y
 - `token`: Personal Access Token with appropriate permissions
 - `repo`: Target repository (e.g., "Dapulse/dapulse")
 
+### Authors
+- `include_token_owner`: If true, automatically includes the GitHub token owner in allowed authors
+- `allowed_users`: List of GitHub usernames whose PRs will be processed
+
 ### Labels
 - `trigger`: Label that triggers CI Plumber processing
 - `auto_add`: Labels automatically added to PRs if missing

@@ -84,6 +84,17 @@ def test_config():
         print(f"{Colors.RED}✗ Linter fix command not configured{Colors.NC}")
         return False
     
+    authors_config = config.get("authors")
+    if authors_config:
+        include_owner = authors_config.get("include_token_owner", True)
+        allowed = authors_config.get("allowed_users", [])
+        print(f"{Colors.GREEN}✓ Authors filtering configured:{Colors.NC}")
+        print(f"  {Colors.CYAN}Include token owner: {include_owner}{Colors.NC}")
+        print(f"  {Colors.CYAN}Allowed users: {', '.join(allowed) if allowed else 'none (only token owner)'}{Colors.NC}")
+    else:
+        print(f"{Colors.RED}✗ Authors section not configured (required){Colors.NC}")
+        return False
+    
     print(f"\n{Colors.GREEN}{Colors.BOLD}")
     print("╔════════════════════════════════════════════════════════════╗")
     print("║        ✓ All configuration checks passed! 🎉             ║")

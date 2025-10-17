@@ -2,6 +2,59 @@
 
 Detailed guide for configuring CI Plumber.
 
+## Author Filtering
+
+CI Plumber can be configured to only process PRs from specific authors (whitelist).
+
+### Configuration
+
+```yaml
+authors:
+  include_token_owner: true  # Auto-include GitHub token owner
+  allowed_users:
+    - "teammate1"
+    - "teammate2"
+```
+
+### Behavior
+
+**`include_token_owner: true`** (default)
+- Automatically detects your GitHub username from the token
+- Adds you to the allowed authors list
+- Useful for personal automation
+
+**`allowed_users`**
+- Additional GitHub usernames to process
+- Can be empty list if you only want your own PRs
+
+### Examples
+
+#### Only your PRs
+```yaml
+authors:
+  include_token_owner: true
+  allowed_users: []
+```
+
+#### Your PRs + teammates
+```yaml
+authors:
+  include_token_owner: true
+  allowed_users:
+    - "john-doe"
+    - "jane-smith"
+```
+
+#### Only specific users (not you)
+```yaml
+authors:
+  include_token_owner: false
+  allowed_users:
+    - "team-lead"
+```
+
+**Note**: The `authors` section is **required**. CI Plumber will fail to start if it's missing.
+
 ## Label Management
 
 CI Plumber supports two types of label management:
@@ -45,6 +98,11 @@ This allows developers to set their own Monoreason but ensures there's always on
 github:
   token: "ghp_yourtoken..."
   repo: "Dapulse/dapulse"
+
+authors:
+  include_token_owner: true
+  allowed_users:
+    - "teammate1"
   
 labels:
   trigger: "ci-plumber-to-merge"
