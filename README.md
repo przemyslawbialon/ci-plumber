@@ -24,7 +24,7 @@ echo $MONDAY_PATH
 
 If not set for any reason, export it temporarily:
 ```bash
-export MONDAY_PATH="/Users/Przemyslawb/Development"
+export MONDAY_PATH="/Users/YourUserName/Development"
 ```
 
 Run the installation script:
