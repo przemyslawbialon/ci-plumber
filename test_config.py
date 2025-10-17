@@ -9,15 +9,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 import yaml  # noqa: E402
 from github import Github, GithubException  # noqa: E402
 
-from src.console_utils import Colors  # noqa: E402
+from src.console_utils import Colors, print_header, print_success_box  # noqa: E402
 
 
 def test_config():
-    print(f"{Colors.CYAN}{Colors.BOLD}")
-    print("╔════════════════════════════════════════════════════════════╗")
-    print("║          Testing CI Plumber Configuration 🧪             ║")
-    print("╚════════════════════════════════════════════════════════════╝")
-    print(f"{Colors.NC}")
+    print_header("Testing CI Plumber Configuration 🧪")
 
     try:
         config_path = Path(__file__).parent / "cfg" / "config.yaml"
@@ -101,11 +97,7 @@ def test_config():
         print(f"{Colors.RED}✗ Authors section not configured (required){Colors.NC}")
         return False
 
-    print(f"\n{Colors.GREEN}{Colors.BOLD}")
-    print("╔════════════════════════════════════════════════════════════╗")
-    print("║        ✓ All configuration checks passed! 🎉             ║")
-    print("╚════════════════════════════════════════════════════════════╝")
-    print(f"{Colors.NC}")
+    print_success_box("✓ All configuration checks passed! 🎉")
     print(f"{Colors.CYAN}You can now run: {Colors.BOLD}python ci_plumber.py{Colors.NC}\n")
     return True
 
